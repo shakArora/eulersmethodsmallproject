@@ -12,13 +12,22 @@ def ask():
         if (i1 < 1000 and i2 < 1000):
             step_size1 = float(input("what do you want your step size for line 1 to be? "))
             step_size2 = float(input("what do you want your step size for line 2 to be? "))
-
             if (step_size1 > 0) and (step_size2 > 0):
                 total_time1 = float(input("what do you want your total time for line 1 to be? "))
                 total_time2 = float(input("what do you want your total time for line 2 to be? "))
                 if (total_time1 > 0) and (total_time2 > 0):
-                    drag_coefficient1 = float(input("what do you want your drag coefficient for line 1 to be? "))
-                    drag_coefficient2 = float(input("what do you want your drag coefficient for line 2 to be? "))
+                    terminalOrDrag = input("Do you want to input your drag coefficients or your terminal velocity? (Enter 1 for Drag Coefficient and 2 for Terminal Velocity): ")
+                    if terminalOrDrag == "1":
+                        drag_coefficient1 = float(input("what do you want your drag coefficient for line 1 to be?"))
+                        drag_coefficient2 = float(input("what do you want your drag coefficient for line 2 to be? "))
+                    elif terminalOrDrag == "2":
+                        drag_coefficient1 = float(input("what do you want your terminal velocity for line 1 to be?"))
+                        drag_coefficient2 = float(input("what do you want your terminal velocity for line 2 to be? "))
+                        drag_coefficient1 = grav/drag_coefficient1
+                        drag_coefficient2 = grav/drag_coefficient2
+                    else:
+                        print("wrong, try again")
+                        ask()
                     if (drag_coefficient1 > 0) and (drag_coefficient2 > 0):
                         print("Proceeding...")
                         return grav, i1, i2, step_size1, step_size2, total_time1, total_time2, drag_coefficient1, drag_coefficient2
@@ -44,14 +53,12 @@ class Line:
         self.drag_coefficient = drag_coefficient
         self.number = number
     def __str__(self):
-        return f"Gravitational Acceleration: {self.gravitational_acceleration}, Initial Velocity: {self.initial_velocity}, Step size: {self.step_size}, Total time: {self.total_time}, Drag Coefficient: {self.drag_coefficient}"
+        return f"Line {self.number}'s Data: Gravitational Acceleration: {self.gravitational_acceleration}, Initial Velocity: {self.initial_velocity}, Step size: {self.step_size}, Total time: {self.total_time}, Drag Coefficient: {self.drag_coefficient}"
     def find_data(self):
         velocities.append([])
         times.append([])
         accelerations.append([])
-
         velocities[self.number-1].append(self.initial_velocity)
-
         for i in range(int(self.total_time // self.step_size)):
             velocities[self.number-1].append(velocities[self.number-1][i]+self.step_size*(self.gravitational_acceleration-(self.drag_coefficient*velocities[self.number-1][i])))
             times[self.number-1].append(i*self.step_size)
@@ -59,8 +66,7 @@ class Line:
             accelerations[self.number-1].append((velocities[self.number-1][i+1]-velocities[self.number-1][i])/self.step_size)
 grav, i1, i2, step_size1, step_size2, total_time1, total_time2, drag_coefficient1, drag_coefficient2 = ask()
 line1 = Line(grav, i1, step_size1, total_time1, drag_coefficient1, 1)
-line2 = Line(grav, i2, step_size2, total_time2, drag_coefficient2, 2)
-
+line2 = Line(grav, i2, step_size2, total_time2, drag_coefficient2, 2) 
 def plot(number):
     plt.figure(figsize=(10, 10))
     plt.subplot(2, 1, 1)
@@ -82,9 +88,9 @@ def main():
     print(line2)
     line1.find_data()
     line2.find_data()
-    print(velocities)
-    print(times)
-    print(accelerations)
+    print("All velocities: ", velocities)
+    print("All times: ", times)
+    print("All accelerations: ", accelerations)
     plot(1)
     plot(2)
 if __name__ == "__main__":
