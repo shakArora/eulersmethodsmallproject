@@ -1,0 +1,60 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+velocities = []
+times = []
+accelerations = []
+
+class Line:
+    def __init__(self, gravitational_acceleration, initial_velocity, step_size, total_time, drag_coefficient, number):
+        self.gravitational_acceleration = gravitational_acceleration
+        self.initial_velocity = initial_velocity
+        self.step_size = step_size
+        self.total_time = total_time
+        self.drag_coefficient = drag_coefficient
+        self.number = number
+    def __str__(self):
+        return f"Gravitational Acceleration: {self.gravitational_acceleration}, Initial Velocity: {self.initial_velocity}, Step size: {self.step_size}, Total time: {self.total_time}, Drag Coefficient: {self.drag_coefficient}"
+    def find_data(self):
+        velocities.append([])
+        times.append([])
+        accelerations.append([])
+
+        velocities[self.number-1].append(self.initial_velocity)
+
+        for i in range(int(self.total_time // self.step_size)):
+            velocities[self.number-1].append(velocities[self.number-1][i]+self.step_size*(self.gravitational_acceleration-(self.drag_coefficient*velocities[self.number-1][i])))
+            times[self.number-1].append(i*self.step_size)
+        for i in range(int(self.total_time // self.step_size)):
+            accelerations[self.number-1].append((velocities[self.number-1][i+1]-velocities[self.number-1][i])/self.step_size)
+grav, ix, iy, step_sizex, step_sizey, total_time, drag_coefficient, x_accel = 9.8, 100,-30,0.5,0.5,10,0.2,0
+
+line1 = Line(grav, ix, step_sizex, total_time, drag_coefficient, 1)
+line2 = Line(x_accel, iy, step_sizey, total_time, drag_coefficient, 2)
+
+def plot(number):
+    plt.figure(figsize=(10, 10))
+    plt.subplot(2, 1, 1)
+    plt.plot(times[number - 1], velocities[number - 1][:-1], label=f'Line {number} Velocity')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Velocity (m/s)')
+    plt.title(f'Velocity vs Time for Line {number}')
+    plt.legend()
+    plt.subplot(2, 1, 2)
+    plt.plot(times[number - 1], accelerations[number - 1], label=f'Line {number} Acceleration', color='orange')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Acceleration (m/s^2)')
+    plt.title(f'Acceleration vs Time for Line {number}')
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+print(line1)
+print(line2)
+line1.find_data()
+line2.find_data()
+print(velocities)
+print(times)
+print(accelerations)
+plot(1)
+plot(2)
+
